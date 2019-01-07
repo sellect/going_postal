@@ -76,7 +76,6 @@ module GoingPostal
     "GN", # Guinea
     "GY", # Guyana
     "HK", # Hong Kong
-    "IE", # Ireland
     "KI", # Kiribati
     "KP", # North Korea
     "MO", # Macau
@@ -239,9 +238,7 @@ module GoingPostal
   def format_non_postcode(string)
     nil
   end
-  # backwards compatibility, no need to alias other non-postcode countries
-  alias format_ie_postcode format_non_postcode
-  
+
   def format_gb_postcode(string)
     out_code = string.to_s.upcase.delete(" \t\r\n")
     in_code = out_code.slice!(-3, 3)
@@ -332,6 +329,15 @@ module GoingPostal
   def format_ro_postcode(string)
     string = string.to_s.delete(" \t\r\n")
     string if string =~ /^[0-9]{6}$/
+  end
+
+  def format_ie_postcode(string)
+    unique_identifier = string.to_s.upcase.delete(" \t\r\n")
+    routing_key = unique_identifier.slice!(0, 3)
+    if routing_key =~ /^([AC-FHKNPRTV-Y]\d{2}|D6W)$/ &&
+      unique_identifier =~ /^[0-9AC-FHKNPRTV-Y]{4}$/
+      [routing_key, unique_identifier].join(" ")
+    end
   end
 
   private
