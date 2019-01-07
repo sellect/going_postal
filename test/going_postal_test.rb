@@ -7,12 +7,12 @@ class GoingPostalTest < MiniTest::Unit::TestCase
   
   def test_required
     assert(GoingPostal.required?("GB"))
-    refute(GoingPostal.required?("IE"))
+    refute(GoingPostal.required?("AO"))
   end
   
   def test_not_required
     refute(GoingPostal.not_required?("GB"))
-    assert(GoingPostal.not_required?("IE"))
+    assert(GoingPostal.not_required?("AO"))
   end
   
   def test_default_country_code_as_mixin
@@ -293,14 +293,29 @@ class GoingPostalTest < MiniTest::Unit::TestCase
     assert_nil(GoingPostal.format_postcode("1234", "AG"))
     assert_nil(GoingPostal.format_postcode("1234", "ST"))
   end
-  
+
+  def test_ie_format_postcode
+    assert_equal("A65 F4E2", GoingPostal.format_postcode("a65f4e2", "IE"))
+    assert_equal("A65 F4E2", GoingPostal.format_postcode("a65 f4e2", "IE"))
+    assert_equal("A65 F4E2", GoingPostal.format_postcode("a 65 F4e2", "IE"))
+
+    assert_nil(GoingPostal.format_postcode("abcd", "IE"))
+  end
+
   def test_ie_postcode_query
-    assert(GoingPostal.postcode?(nil, "IE"))
-    assert(GoingPostal.postcode?("", "IE"))
-    
-    refute(GoingPostal.postcode?("A9A 9AA", "IE"))
+    refute(GoingPostal.postcode?(nil, "IE"))
+    refute(GoingPostal.postcode?("", "IE"))
     refute(GoingPostal.postcode?("12345", "IE"))
-    refute(GoingPostal.postcode?("1234", "IE"))
+    refute(GoingPostal.postcode?("A9A 9AA", "IE"))
+
+    assert(GoingPostal.postcode?("A65 F4E2", "IE"))
+    refute(GoingPostal.postcode?("B65 F4E2", "IE"))
+    refute(GoingPostal.postcode?("AK5 F4E2", "IE"))
+    refute(GoingPostal.postcode?("AKA F4E2", "IE"))
+
+    assert(GoingPostal.postcode?("D6W D7T7", "IE"))
+    refute(GoingPostal.postcode?("D1W D7T7", "IE"))
+    refute(GoingPostal.postcode?("A6W D7T7", "IE"))
   end
   
   def test_ch_format_postcode
